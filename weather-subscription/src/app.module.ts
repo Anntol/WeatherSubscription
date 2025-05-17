@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { WeatherController } from './weather/weather.controller';
+import { SubscriptionController } from './subscription/subscription.controller';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { WeatherController } from './weather/weather.controller';
       isGlobal: true,
     }),
   ],
-  controllers: [AppController, WeatherController],
+  controllers: [AppController, WeatherController, SubscriptionController],
   providers: [AppService],
 })
 export class AppModule {}
