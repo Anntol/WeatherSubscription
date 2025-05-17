@@ -23,7 +23,10 @@
       ],
       "@dto/*": [
         "src/dto/*"
-      ]
+      ],
+      "@modules/*": [
+        "src/modules/*"
+      ],
     }
   }
 }

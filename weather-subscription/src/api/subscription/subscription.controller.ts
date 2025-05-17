@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { Frequency } from '@dto/subscription.dto';
+import { EmailService } from '@modules/email/email.service';
 
 @Controller('api')
 export class SubscriptionController {
+  constructor(private readonly emailService: EmailService) {}
+
   @Post('subscribe')
   async subscribe(
     @Body() body: { email: string; city: string; frequency: Frequency },
@@ -11,11 +22,21 @@ export class SubscriptionController {
     //TODO generate confirmation token
     //TODO send confirmation email
     //TODO save subscription to database
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Subscription data:', body);
-    return {
-      message: 'Subscription successful. Confirmation email sent.',
-    };
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await this.emailService.sendEmail(
+        body.email,
+        'Subscription Confirmation',
+        'Please confirm your subscription by clicking the link below:',
+      );
+      console.log('Subscription data:', body);
+      return {
+        message: 'Subscription successful. Confirmation email sent.',
+      };
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new HttpException('Invalid input', HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get('confirm/:token')
