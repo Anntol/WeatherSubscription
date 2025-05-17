@@ -6,7 +6,7 @@ import {
   Injectable,
   Query,
 } from '@nestjs/common';
-import { WeatherDto } from './weather.dto';
+import { WeatherDto } from '@dto/weather.dto';
 import { ConfigService } from '@nestjs/config';
 
 interface WeatherApiResponse {
@@ -23,13 +23,13 @@ interface WeatherApiResponse {
   };
 }
 
-@Controller('weather')
+@Controller('api')
 @Injectable()
 export class WeatherController {
   constructor(private readonly configService: ConfigService) {}
 
-  @Get()
-  async getCurrentWeather(@Query('city') city: string) {
+  @Get('weather')
+  async getCurrentWeather(@Query('city') city: string): Promise<WeatherDto> {
     const apiNotFoundCode = 1006;
     const apiUrl =
       this.configService.get<string>('WEATHER_API_URL') ||

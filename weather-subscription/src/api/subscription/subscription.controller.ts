@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Frequency } from './subscription.dto';
+import { Frequency } from '@dto/subscription.dto';
 
-@Controller('')
+@Controller('api')
 export class SubscriptionController {
   @Post('subscribe')
   async subscribe(
     @Body() body: { email: string; city: string; frequency: Frequency },
   ) {
+    //TODO data validation
     //TODO generate confirmation token
     //TODO send confirmation email
     //TODO save subscription to database
