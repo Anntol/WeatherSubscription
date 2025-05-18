@@ -19,15 +19,17 @@ export class SubscriptionController {
     @Body() body: { email: string; city: string; frequency: Frequency },
   ) {
     //TODO data validation
-    //TODO generate confirmation token
-    //TODO send confirmation email
     //TODO save subscription to database
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const token = this.emailService.generateToken(body.email);
+      const url = `http://localhost:3002/api/confirm/${token}`; //TODO server url
+      const confirmationLink = `<a href="${url}">Confirm Subscription</a>`;
+
       await this.emailService.sendEmail(
         body.email,
         'Subscription Confirmation',
-        'Please confirm your subscription by clicking the link below:',
+        'Please confirm your subscription by clicking the link below: ' +
+          confirmationLink,
       );
       console.log('Subscription data:', body);
       return {
@@ -41,10 +43,9 @@ export class SubscriptionController {
 
   @Get('confirm/:token')
   async confirmSubscription(@Param('token') token: string) {
-    //TODO check token validity
     //TODO update subscription confirmation in database
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('confirm Subscription', token);
+    const email = await this.emailService.decodeToken(token);
+    console.log('confirm Subscription', email);
     return {
       message: 'Subscription confirmed successfully',
     };
@@ -52,10 +53,9 @@ export class SubscriptionController {
 
   @Get('unsubscribe/:token')
   async unsubscribe(@Param('token') token: string) {
-    //TODO check token validity
     //TODO delete subscription from database
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('unsubscribe', token);
+    const email = await this.emailService.decodeToken(token);
+    console.log('unsubscribe', email);
     return {
       message: 'Unsubscribed successfully',
     };

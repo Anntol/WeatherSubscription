@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { ApiModule } from '@api/api.module';
 import { EmailModule } from '@modules/email/email.module';
 import { EmailService } from '@modules/email/email.service';
@@ -11,6 +12,9 @@ import { EmailService } from '@modules/email/email.service';
     ApiModule,
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    JwtModule.register({
+      global: true,
     }),
     EmailModule,
   ],
