@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
 } from '@nestjs/common';
 import { Frequency } from '@dto/subscription.dto';
 import { EmailService } from '@modules/email/email.service';
@@ -17,12 +18,13 @@ export class SubscriptionController {
   @Post('subscribe')
   async subscribe(
     @Body() body: { email: string; city: string; frequency: Frequency },
+    @Req() req: Request,
   ) {
     //TODO data validation
     //TODO save subscription to database
     try {
       const token = this.emailService.generateToken(body.email);
-      const url = `http://localhost:3002/api/confirm/${token}`; //TODO server url
+      const url = `${req['protocol']}://${req.headers['host']}/api/confirm/${token}`;
       const confirmationLink = `<a href="${url}">Confirm Subscription</a>`;
 
       await this.emailService.sendEmail(
