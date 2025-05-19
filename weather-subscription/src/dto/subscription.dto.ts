@@ -1,14 +1,15 @@
-export type Frequency = 'hourly' | 'daily';
+import { FrequencyEnum } from '@enums/frequency';
+
 export class SubcriptionDto {
   email: string;
   city: string;
-  frequency: Frequency;
+  frequency: FrequencyEnum;
   confirmed: boolean;
 
   constructor(
     email: string,
     city: string,
-    frequency: Frequency,
+    frequency: FrequencyEnum,
     confirmed: boolean = false,
   ) {
     this.email = email;

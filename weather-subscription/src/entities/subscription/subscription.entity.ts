@@ -1,9 +1,5 @@
+import { FrequencyEnum } from 'src/enums/frequency';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum FrequencyEnum {
-  HOURLY = 'HOURLY',
-  DAILY = 'DAILY',
-}
 
 @Entity()
 class Subscription {

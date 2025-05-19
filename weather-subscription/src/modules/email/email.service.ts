@@ -78,4 +78,21 @@ export class EmailService implements OnModuleInit {
       throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async sendConfirmationEmail(email: string, protocol: string, host: string) {
+    const token = this.generateToken(email);
+    const url = `${protocol}://${host}/api/confirm/${token}`;
+    const confirmationLink = `<a href="${url}">Confirm Subscription</a>`;
+    try {
+      await this.sendEmail(
+        email,
+        'Subscription Confirmation',
+        'Please confirm your subscription by clicking the link below: ' +
+          confirmationLink,
+      );
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new HttpException('Invalid input', HttpStatus.BAD_REQUEST);
+    }
+  }
 }

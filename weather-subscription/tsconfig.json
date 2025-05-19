@@ -24,6 +24,9 @@
       "@dto/*": [
         "src/dto/*"
       ],
+      "@enums/*": [
+        "src/enums/*"
+      ],
       "@entities/*": [
         "src/entities/*"
       ],
