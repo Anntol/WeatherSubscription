@@ -10,6 +10,7 @@ async function bootstrap() {
   try {
     app.useGlobalPipes(new ValidationPipe());
     await app.listen(configService.get('PORT') || defaultPort);
+    console.log(`Application is running on: ${await app.getUrl()}`);
   } catch (error) {
     console.error('Error starting the application:', error);
     process.exit(1);
