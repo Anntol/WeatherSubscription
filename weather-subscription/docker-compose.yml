@@ -1,0 +1,35 @@
+services:
+  postgres:
+    container_name: postgres
+    restart: always
+    image: postgres:17-alpine
+    ports:
+    - "5432:5432"
+    volumes:
+    - pgdata:/data/postgres
+    env_file:
+    - docker.env
+    networks:
+    - postgres
+ 
+  pgadmin:
+    links:
+    - postgres:postgres
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+    - "8080:80"
+    volumes:
+    - pgdata:/root/.pgadmin
+    env_file:
+    - docker.env
+    networks:
+    - postgres
+ 
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: dbdata

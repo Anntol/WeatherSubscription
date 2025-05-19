@@ -10,10 +10,14 @@ import {
 } from '@nestjs/common';
 import { Frequency } from '@dto/subscription.dto';
 import { EmailService } from '@modules/email/email.service';
+import { SubscriptionsService } from '@entities/subscription/subsctiption.service';
 
 @Controller('api')
 export class SubscriptionController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(
+    private readonly emailService: EmailService,
+    private subscriptionsService: SubscriptionsService,
+  ) {}
 
   @Post('subscribe')
   async subscribe(
@@ -21,19 +25,31 @@ export class SubscriptionController {
     @Req() req: Request,
   ) {
     //TODO data validation
-    //TODO save subscription to database
     try {
-      const token = this.emailService.generateToken(body.email);
+      const { email, city, frequency } = body;
+      const subscription = await this.subscriptionsService.create(
+        email,
+        city,
+        frequency,
+      );
+      if (!subscription) {
+        throw new HttpException(
+          'Email already subscribed',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      const token = this.emailService.generateToken(email);
       const url = `${req['protocol']}://${req.headers['host']}/api/confirm/${token}`;
       const confirmationLink = `<a href="${url}">Confirm Subscription</a>`;
 
       await this.emailService.sendEmail(
-        body.email,
+        email,
         'Subscription Confirmation',
         'Please confirm your subscription by clicking the link below: ' +
           confirmationLink,
       );
-      console.log('Subscription data:', body);
+
       return {
         message: 'Subscription successful. Confirmation email sent.',
       };
@@ -45,9 +61,9 @@ export class SubscriptionController {
 
   @Get('confirm/:token')
   async confirmSubscription(@Param('token') token: string) {
-    //TODO update subscription confirmation in database
-    const email = await this.emailService.decodeToken(token);
-    console.log('confirm Subscription', email);
+    const email = this.emailService.decodeToken(token);
+    await this.subscriptionsService.confirmEmail(email);
+
     return {
       message: 'Subscription confirmed successfully',
     };
@@ -55,9 +71,9 @@ export class SubscriptionController {
 
   @Get('unsubscribe/:token')
   async unsubscribe(@Param('token') token: string) {
-    //TODO delete subscription from database
-    const email = await this.emailService.decodeToken(token);
-    console.log('unsubscribe', email);
+    const email = this.emailService.decodeToken(token);
+    await this.subscriptionsService.removeByEmail(email);
+
     return {
       message: 'Unsubscribed successfully',
     };

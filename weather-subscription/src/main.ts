@@ -6,6 +6,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const defaultPort = 3000;
-  await app.listen(configService.get('PORT') || defaultPort);
+  try {
+    await app.listen(configService.get('PORT') || defaultPort);
+  } catch (error) {
+    console.error('Error starting the application:', error);
+    process.exit(1);
+  }
 }
 bootstrap();
