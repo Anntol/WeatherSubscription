@@ -3,12 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Subscription from './subscription.entity';
 import { ISubscription } from './subscription.interface';
+import { FrequencyEnum } from '@enums/frequency';
+import { WeatherService } from '@modules/weather/weather.service';
+import { EmailService } from '@modules/email/email.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     @InjectRepository(Subscription)
     private subscriptionsRepository: Repository<Subscription>,
+    private readonly emailService: EmailService,
+    private readonly weatherService: WeatherService,
   ) {}
 
   async createSubscription(
@@ -55,6 +60,44 @@ export class SubscriptionsService {
       await this.subscriptionsRepository.delete(subscription.id);
     } else {
       throw new HttpException('Token not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async sendHourlyEmails(): Promise<void> {
+    const subscriptions = await this.subscriptionsRepository.find({
+      where: {
+        frequency: FrequencyEnum.HOURLY,
+      },
+    });
+    for (const subscription of subscriptions) {
+      const weather = await this.weatherService.getCurrentWeather(
+        subscription.city,
+      );
+      this.emailService.sendPeriodicEmail(
+        subscription.email,
+        subscription.city,
+        weather,
+        'hourly',
+      );
+    }
+  }
+
+  async sendDailyEmails(): Promise<void> {
+    const subscriptions = await this.subscriptionsRepository.find({
+      where: {
+        frequency: FrequencyEnum.DAILY,
+      },
+    });
+    for (const subscription of subscriptions) {
+      const weather = await this.weatherService.getCurrentWeather(
+        subscription.city,
+      );
+      this.emailService.sendPeriodicEmail(
+        subscription.email,
+        subscription.city,
+        weather,
+        'daily',
+      );
     }
   }
 }

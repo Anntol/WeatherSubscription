@@ -1,3 +1,4 @@
+import { WeatherDto } from '@dto/weather.dto';
 import {
   HttpException,
   HttpStatus,
@@ -89,6 +90,28 @@ export class EmailService implements OnModuleInit {
         'Subscription Confirmation',
         'Please confirm your subscription by clicking the link below: ' +
           confirmationLink,
+      );
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new HttpException('Invalid input', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async sendPeriodicEmail(
+    email: string,
+    city: string,
+    weather: WeatherDto,
+    period: 'hourly' | 'daily',
+  ) {
+    const token = this.generateToken(email);
+    try {
+      await this.sendEmail(
+        email,
+        `Your ${period} weather update`,
+        `Current weather in ${city} is ${weather.description}.
+  Temperature: ${weather.temperature}°C.
+  Humidity: ${weather.humidity}%.
+Please use ${token} to unsubscribe.`,
       );
     } catch (error) {
       console.error('Error sending email:', error);
